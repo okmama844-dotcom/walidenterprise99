@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Walid Enterprise - User App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Hind Siliguri', sans-serif; background: #e5e7eb; display: flex; justify-content: center; }
+        .mobile-container { width: 100%; max-width: 420px; background: #f4f7fb; min-height: 100vh; position: relative; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.2); overflow-x: hidden; }
+        .app-header { background: #0B3B8C; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo-area { display: flex; align-items: center; gap: 10px; }
+        .logo-box img { width: 40px; height: 40px; object-fit: contain; background: white; border-radius: 50%; padding: 2px; }
+        .text-area h1 { font-size: 16px; margin: 0; font-weight: 600; }
+        .text-area p { font-size: 11px; margin: 0; opacity: 0.8; }
+        .cart-icon { position: relative; font-size: 20px; cursor: pointer; }
+        .badge { background: #ff4747; color: white; font-size: 10px; padding: 2px 6px; border-radius: 50%; position: absolute; top: -8px; right: -10px; font-weight: bold; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .banner-container { padding: 15px; }
+        .main-banner { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: block; }
+        .categories { display: flex; justify-content: space-between; padding: 15px; background: #fff; margin: 0 15px 15px 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .cat-item { text-align: center; font-size: 12px; color: #333; font-weight: 500; cursor: pointer; }
+        .icon-box { width: 50px; height: 50px; background: #f0f4ff; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: 0 auto 8px auto; font-size: 22px; transition: 0.3s; }
+        .cat-item:hover .icon-box { background: #dbeafe; transform: scale(1.05); }
+        .section-title { padding: 0 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .section-title h2 { font-size: 18px; color: #1f2937; margin: 0; }
+        .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 15px 15px 15px; }
+        .product-card { background: #fff; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative; display: flex; flex-direction: column; }
+        .product-img-wrapper { height: 90px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+        .product-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .discount-badge { position: absolute; top: 8px; left: 8px; background: #ff4747; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; z-index: 10;}
+        .product-info { text-align: left; flex-grow: 1; display: flex; flex-direction: column; }
+        .old-price { text-decoration: line-through; color: #9ca3af; font-size: 12px; margin: 0; }
+        .new-price { color: #0B3B8C; margin: 2px 0; font-size: 18px; font-weight: 700; }
+        .product-name { font-size: 14px; margin: 2px 0; font-weight: 600; color: #1f2937; }
+        .product-weight { font-size: 12px; color: #6b7280; margin-bottom: 8px; }
+        .delivery-info { font-size: 11px; color: #059669; font-weight: 600; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 10px; width: fit-content;}
+        .add-to-cart-btn { width: 100%; background: #0B3B8C; color: white; border: none; padding: 8px; border-radius: 8px; font-size: 13px; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: auto; }
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; max-width: 420px; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.08); z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 11px; color: #6b7280; cursor: pointer; gap: 4px; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: #0B3B8C; font-weight: 600; }
+        .cart-nav { position: relative; top: -15px; background: #0B3B8C; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(11, 59, 140, 0.4); border: 4px solid #f4f7fb; }
+        .cart-badge-nav { background: #ff4747; color: white; font-size: 10px; padding: 2px 6px; border-radius: 50%; position: absolute; top: 0; right: 0; font-weight: bold; border: 2px solid #fff; }
+        .cart-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: flex-end; z-index: 1000; }
+        .cart-modal.active { display: flex; }
+        .cart-content { background: #fff; width: 100%; max-width: 420px; border-radius: 20px 20px 0 0; max-height: 85vh; display: flex; flex-direction: column; animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #eee; }
+        .cart-items { padding: 15px 20px; overflow-y: auto; flex-grow: 1; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f3f4f6; padding: 10px 0; }
+        .qty-controls { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .qty-btn { background: #e5e7eb; border: none; width: 25px; height: 25px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #f9fafb; border-radius: 20px 20px 0 0; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; color: #4b5563; }
+        .summary-row.total { font-size: 18px; font-weight: bold; color: #0B3B8C; border-top: 1px dashed #d1d5db; padding-top: 10px; margin-top: 10px; }
+        .checkout-btn { width: 100%; background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 16px; font-family: inherit; font-weight: 600; cursor: pointer; margin-top: 15px; }
+        .profile-container { padding: 15px; }
+        .profile-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 14px; color: #374151; font-weight: 500; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; }
+        .save-btn { width: 100%; background: #0B3B8C; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .delivery-animation-container { display: none; text-align: center; padding: 20px; background: #fff; border-radius: 12px; margin: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .spinner { width: 60px; height: 60px; border: 6px solid #e0e7ff; border-top: 6px solid #0B3B8C; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .delivery-text { color: #0B3B8C; font-weight: 600; font-size: 16px; }
+        .delivery-subtext { color: #6b7280; font-size: 13px; margin-top: 5px; }
+        .order-countdown { margin-top:10px; padding:10px; border-radius:10px; background:#eff6ff; color:#1d4ed8; font-size:20px; font-weight:700; letter-spacing:1px; }
+        .order-status-pill { display:inline-block; padding:4px 9px; border-radius:20px; background:#e0f2fe; color:#0369a1; font-size:12px; font-weight:700; margin-top:8px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #6b7280; }
+        .checkout-user-info { background: #e0f2fe; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; color: #0369a1; border-left: 4px solid #0ea5e9; display: none;}
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-box"><img id="header-logo" src="" onerror="this.src='https://via.placeholder.com/40/0B3B8C/FFF?text=WE'"></div>
+                <div class="text-area"><h1>Walid Enterprise</h1><p>নিরাপদ গ্যাস, নিরাপদ জীবন</p></div>
+            </div>
+            <div class="cart-icon" onclick="openCart()"><i class="fas fa-shopping-cart"></i><span class="badge" id="cart-badge">0</span></div>
+        </header>
+
+        <main class="tab-content active" id="tab-home">
+            <div class="banner-container"><img id="main-banner-img" src="" class="main-banner" onerror="this.src='https://via.placeholder.com/400x400/0B3B8C/FFF?text=Banner'"></div>
+            <div class="delivery-animation-container" id="delivery-animation">
+                <div class="spinner"></div>
+                <div class="delivery-text">আপনার অর্ডারটি প্রসেসিং হচ্ছে...</div>
+                <div class="delivery-subtext">ডেলিভারি সময়: <b>৫ থেকে ৩০ মিনিট</b></div>
+            </div>
+            <div class="categories">
+                <div class="cat-item"><div class="icon-box"><i class="fas fa-fire" style="color: #ff4747;"></i></div><p>গ্যাস সিলিন্ডার</p></div>
+                <div class="cat-item"><div class="icon-box"><i class="fas fa-wrench" style="color: #3b82f6;"></i></div><p>রেগুলেটর</p></div>
+                <div class="cat-item"><div class="icon-box"><i class="fas fa-tools" style="color: #10b981;"></i></div><p>হোস পাইপ</p></div>
+                <div class="cat-item"><div class="icon-box"><i class="fas fa-th-large" style="color: #f59e0b;"></i></div><p>আরও</p></div>
+            </div>
+            <div class="section-title"><h2>জনপ্রিয় পণ্যসমূহ</h2></div>
+            <div class="product-grid" id="product-list"></div>
+        </main>
+
+        <main class="tab-content" id="tab-orders">
+            <div class="section-title" style="margin-top: 15px;"><h2>আমার অর্ডারসমূহ</h2></div>
+            <div id="order-history-container" class="profile-container">
+                <div class="empty-state"><i class="fas fa-box-open"></i><p>আপনার কোনো অর্ডার হিস্ট্রি নেই।</p></div>
+            </div>
+        </main>
+
+        <main class="tab-content" id="tab-account">
+            <div class="section-title" style="margin-top: 15px;"><h2>আমার একাউন্ট</h2></div>
+            <div class="profile-container">
+                <div class="profile-card">
+                    <form id="profileForm">
+                        <div class="form-group"><label>আপনার নাম</label><input type="text" id="userName" required></div>
+                        <div class="form-group"><label>মোবাইল নাম্বার</label><input type="tel" id="userPhone" required></div>
+                        <div class="form-group"><label>জিমেইল</label><input type="email" id="userEmail"></div>
+                        <div class="form-group"><label>ডেলিভারি লোকেশন</label><input type="text" id="userLocation" required></div>
+                        <button type="submit" class="save-btn">তথ্য সেভ করুন</button>
+                        <button type="button" id="enableOrderNotifications" class="save-btn" style="background:#059669;">অর্ডার নোটিফিকেশন চালু করুন</button>
+                        <p id="orderNotificationStatus" style="font-size:12px;color:#6b7280;margin-top:8px;"></p>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" id="nav-home" onclick="switchTab('home')"><i class="fas fa-home"></i><span>হোম</span></div>
+            <div class="nav-item" id="nav-orders" onclick="switchTab('orders')"><i class="fas fa-clipboard-list"></i><span>অর্ডার</span></div>
+            <div class="nav-item cart-nav" onclick="openCart()"><i class="fas fa-shopping-cart"></i><span class="cart-badge-nav" id="nav-cart-badge">0</span></div>
+            <div class="nav-item" id="nav-account" onclick="switchTab('account')"><i class="fas fa-user"></i><span>আকাউন্ট</span></div>
+            <div class="nav-item"><i class="fas fa-bars"></i><span>আরও</span></div>
+        </nav>
+
+        <div class="cart-modal" id="cartModal">
+            <div class="cart-content">
+                <div class="cart-header"><h3>আপনার কার্ট</h3><button onclick="closeCart()"><i class="fas fa-times"></i></button></div>
+                <div class="cart-items" id="cart-items-container"></div>
+                <div class="cart-footer" id="cart-footer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, doc, getDoc, setDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-messaging.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8oBWqJMYhZnqdPKresifitHHbCvfhAbA",
+            authDomain: "olmc2-90b41.firebaseapp.com",
+            projectId: "olmc2-90b41",
+            storageBucket: "olmc2-90b41.firebasestorage.app",
+            messagingSenderId: "984236456405",
+            appId: "1:984236456405:web:0e83bd61fdd8548866255c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let products = [];
+        let cart = [];
+        let userProfile = JSON.parse(localStorage.getItem('we_user_profile')) || null;
+        
+        async function loadDataFromFirebase() {
+            const settingsDoc = await getDoc(doc(db, "settings", "app_config"));
+            if (settingsDoc.exists()) {
+                const settings = settingsDoc.data();
+                document.getElementById('header-logo').src = settings.logoUrl || '';
+                document.getElementById('main-banner-img').src = settings.bannerUrl || '';
+            }
+            const querySnapshot = await getDocs(collection(db, "products"));
+            products = [];
+            querySnapshot.forEach((doc) => { products.push({ id: doc.id, ...doc.data() }); });
+            renderProducts();
+        }
+
+        window.switchTab = async function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.getElementById(`nav-${tabName}`).classList.add('active');
+            if(tabName === 'orders') await renderOrderHistory();
+            if(tabName === 'account') loadProfileData();
+        }
+
+        function renderProducts() {
+            const container = document.getElementById('product-list');
+            container.innerHTML = products.map(product => `
+                <div class="product-card">
+                    <div class="discount-badge">${product.discountPercent || 0}% ছাড়</div>
+                    <div class="product-img-wrapper"><img src="${product.imageUrl}" class="product-img" onerror="this.src='https://via.placeholder.com/80?text=No+Image'"></div>
+                    <div class="product-info">
+                        <p class="old-price">৳ ${product.originalPrice}</p>
+                        <h3 class="new-price">৳ ${product.price}</h3>
+                        <p class="product-name">${product.name}</p>
+                        <p class="product-weight">${product.weight}</p>
+                        <span class="delivery-info"><i class="fas fa-truck"></i> ডেলিভারি: ৳ ${product.deliveryCharge}</span>
+                        <button class="add-to-cart-btn" onclick="addToCart('${product.id}')">কার্টে যোগ করুন</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.addToCart = function(id) {
+            const product = products.find(p => p.id === id);
+            const existingItem = cart.find(item => item.id === id);
+            if (existingItem) { existingItem.quantity += 1; } 
+            else { cart.push({ ...product, quantity: 1 }); }
+            updateCartUI();
+        }
+
+        window.changeQty = function(id, change) {
+            const item = cart.find(i => i.id === id);
+            if(item) {
+                item.quantity += change;
+                if(item.quantity <= 0) { cart = cart.filter(i => i.id !== id); }
+                updateCartUI();
+            }
+        }
+
+        function updateCartUI() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-badge').innerText = totalItems;
+            document.getElementById('nav-cart-badge').innerText = totalItems;
+            const container = document.getElementById('cart-items-container');
+            const footer = document.getElementById('cart-footer');
+            if (cart.length === 0) {
+                container.innerHTML = `<p style="text-align:center; margin-top:20px;">আপনার কার্ট খালি।</p>`;
+                footer.innerHTML = '';
+                return;
+            }
+            let subtotal = 0, totalDelivery = 0;
+            container.innerHTML = cart.map(item => {
+                const itemSub = item.price * item.quantity;
+                subtotal += itemSub;
+                totalDelivery += (item.deliveryCharge * item.quantity);
+                return `
+                    <div class="cart-item-row">
+                        <div class="cart-item-info">
+                            <h4>${item.name}</h4>
+                            <p>ডেলিভারি: ৳ ${item.deliveryCharge} / টি</p>
+                            <div class="qty-controls">
+                                <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
+                                <span>${item.quantity}</span>
+                                <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="cart-item-price">৳ ${itemSub}</div>
+                    </div>
+                `;
+            }).join('');
+            const grandTotal = subtotal + totalDelivery;
+            const userInfoHtml = userProfile ? 
+                `<div class="checkout-user-info" style="display:block;">${userProfile.name} | ${userProfile.phone}<br>${userProfile.location}</div>` : 
+                `<div class="checkout-user-info" style="display:block; background:#fef2f2; border-color:#ef4444; color:#b91c1c;">অর্ডার করতে আগে একাউন্ট থেকে তথ্য সেভ করুন।</div>`;
+            footer.innerHTML = `
+                ${userInfoHtml}
+                <div class="summary-row"><span>সাবটোটাল:</span><span>৳ ${subtotal}</span></div>
+                <div class="summary-row"><span>মোট ডেলিভারি চার্জ:</span><span>৳ ${totalDelivery}</span></div>
+                <div class="summary-row total"><span>সর্বমোট:</span><span>৳ ${grandTotal}</span></div>
+                <button class="checkout-btn" onclick="checkout(${grandTotal})">অর্ডার কনফার্ম করুন</button>
+            `;
+        }
+
+        window.openCart = function() { document.getElementById('cartModal').classList.add('active'); updateCartUI(); }
+        window.closeCart = function() { document.getElementById('cartModal').classList.remove('active'); }
+
+        window.checkout = async function(grandTotal) {
+            if (cart.length === 0) return;
+            if (!userProfile) {
+                alert("অনুগ্রহ করে আগে 'একাউন্ট' থেকে আপনার তথ্য সেভ করুন।");
+                closeCart(); switchTab('account'); return;
+            }
+            const orderId = "ORD-" + Math.floor(Math.random() * 1000000);
+            const newOrder = {
+                orderId: orderId, date: new Date().toLocaleString('bn-BD'), createdAt: Date.now(),
+                items: cart, total: grandTotal, status: "প্রসেসিং", customer: userProfile
+            };
+            try {
+                await addDoc(collection(db, "orders"), newOrder);
+                alert("অর্ডার সফল হয়েছে! অ্যাডমিন গ্রহণ করলে ডেলিভারির সময় দেখানো হবে।");
+                cart = []; updateCartUI(); closeCart(); switchTab('home'); 
+                document.getElementById('delivery-animation').style.display = 'none'; 
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                alert("অর্ডার করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
+            }
+        }
+
+        function loadProfileData() {
+            if (userProfile) {
+                document.getElementById('userName').value = userProfile.name || '';
+                document.getElementById('userPhone').value = userProfile.phone || '';
+                document.getElementById('userEmail').value = userProfile.email || '';
+                document.getElementById('userLocation').value = userProfile.location || '';
+            }
+        }
+
+        document.getElementById('enableOrderNotifications')?.addEventListener('click', async () => {
+            const status = document.getElementById('orderNotificationStatus');
+            if (!("Notification" in window)) { status.textContent = "এই ব্রাউজারে নোটিফিকেশন সমর্থিত নয়।"; return; }
+            const permission = await Notification.requestPermission();
+            if (permission !== "granted") { status.textContent = "নোটিফিকেশন অনুমতি দেওয়া হয়নি।"; return; }
+
+            try {
+                const messaging = getMessaging(app);
+                const token = await getToken(messaging, { 
+                    vapidKey: 'BO9_vPsO6tmLpkzGkODC7C8wqnhpDk1RaS2wtxKkbrYNax2PTYUZgiR_fQfFOEqOmZNg2NLxZOsKJ45W3UQFozY' 
+                });
+                
+                if (token) {
+                    console.log("FCM Token:", token);
+                    if(userProfile && userProfile.phone) {
+                        await setDoc(doc(db, "users", userProfile.phone), { 
+                            fcmToken: token,
+                            phone: userProfile.phone,
+                            name: userProfile.name
+                        }, { merge: true });
+                        status.textContent = "অর্ডার নোটিফিকেশন চালু হয়েছে।";
+                    } else {
+                        status.textContent = "আগে আপনার প্রোফাইল সেভ করুন, তারপর নোটিফিকেশন চালু করুন।";
+                    }
+                } else {
+                    status.textContent = "টোকেন পাওয়া যায়নি, আবার চেষ্টা করুন।";
+                }
+            } catch (err) {
+                console.error('FCM Error:', err);
+                status.textContent = "নোটিফিকেশন চালু করা যায়নি। (ইন্টারনেট সমস্যা বা VAPID Key ভুল)";
+            }
+        });
+
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            userProfile = {
+                name: document.getElementById('userName').value,
+                phone: document.getElementById('userPhone').value,
+                email: document.getElementById('userEmail').value,
+                location: document.getElementById('userLocation').value
+            };
+            localStorage.setItem('we_user_profile', JSON.stringify(userProfile));
+            alert("তথ্য সেভ হয়েছে!");
+            updateCartUI();
+        });
+
+        let orderCountdownTimer = null;
+        let orderHistoryUnsubscribe = null;
+        const knownOrderStates = new Map();
+        async function renderOrderHistory() {
+            const container = document.getElementById('order-history-container');
+            if (!userProfile || !userProfile.phone) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>আপনার কোনো অর্ডার নেই।</p></div>`;
+                return;
+            }
+            try {
+                const q = query(collection(db, "orders"), where("customer.phone", "==", userProfile.phone));
+                if (orderHistoryUnsubscribe) orderHistoryUnsubscribe();
+                orderHistoryUnsubscribe = onSnapshot(q, (querySnapshot) => {
+                    const orders = [];
+                    querySnapshot.forEach((docSnap) => {
+                        const order = { id: docSnap.id, ...docSnap.data() };
+                        knownOrderStates.set(order.id, order.status || "প্রসেসিং");
+                        orders.push(order);
+                    });
+                    orders.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    if (orders.length === 0) {
+                        container.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>আপনার কোনো অর্ডার নেই।</p></div>`;
+                        return;
+                    }
+                    container.innerHTML = orders.map(order => `
+                    <div class="profile-card" style="margin-bottom:15px;">
+                        <h4 style="margin:0;color:#0B3B8C;">${order.orderId || 'অর্ডার'}</h4>
+                        <p style="margin:0;font-size:12px;color:#6b7280;">${order.date || ''}</p>
+                        <div style="margin-top:10px;">
+                          ${(Array.isArray(order.items) ? order.items : []).map(item => `
+                            <div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #e5e7eb;">
+                              <img src="${item.imageUrl || ''}" alt="" onerror="this.style.display='none'" style="width:52px;height:52px;object-fit:contain;background:#f8fafc;border-radius:8px;">
+                              <div><b>${item.name || 'পণ্য'}</b><br><small>পরিমাণ: ${Number(item.quantity || 1)} × ৳${Number(item.price || 0)}</small></div>
+                              <b style="margin-left:auto;white-space:nowrap;">৳${Number(item.quantity || 1) * Number(item.price || 0)}</b>
+                            </div>`).join('')}
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-top:10px;font-weight:bold;"><span>সর্বমোট:</span><span>৳ ${order.total || 0}</span></div>
+                        <div class="order-status-pill">স্ট্যাটাস: ${order.status || 'প্রসেসিং'}</div>
+                        ${order.status === 'ডেলিভারি' && order.estimatedCompletionAt ? `<div class="order-countdown" data-deadline="${Number(order.estimatedCompletionAt)}">সময় গণনা হচ্ছে...</div><div class="delivery-subtext">নির্ধারিত সময়: ${order.estimatedMinutes || ''} মিনিট</div>` : ''}
+                        ${order.status === 'সম্পন্ন' ? '<p style="color:#059669;font-weight:700;margin-top:8px;">আপনার অর্ডার সম্পন্ন হয়েছে।</p>' : ''}
+                        ${order.status === 'বাতিল' ? '<p style="color:#dc2626;font-weight:700;margin-top:8px;">আপনার অর্ডারটি বাতিল করা হয়েছে।</p>' : ''}
+                    </div>`).join('');
+                    startOrderCountdowns();
+                }, (error) => {
+                    console.error("Live order history error:", error);
+                    container.innerHTML = `<div class="empty-state">অর্ডার আপডেট পাওয়া যায়নি। ইন্টারনেট/Firebase Rules পরীক্ষা করুন।</div>`;
+                });
+            } catch (error) {
+                console.error("Error fetching orders: ", error);
+                container.innerHTML = `<div class="empty-state">অর্ডার লোড করা যায়নি। ইন্টারনেট সংযোগ পরীক্ষা করুন।</div>`;
+            }
+        }
+
+        function startOrderCountdowns() {
+            if (orderCountdownTimer) clearInterval(orderCountdownTimer);
+            const update = () => document.querySelectorAll('.order-countdown[data-deadline]').forEach(el => {
+                const remaining = Math.max(0, Number(el.dataset.deadline) - Date.now());
+                const totalSeconds = Math.floor(remaining / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                el.textContent = remaining <= 0 ? 'সময় শেষ — ডেলিভারি আপডেটের অপেক্ষায়' :
+                    `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+            });
+            update();
+            orderCountdownTimer = setInterval(update, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDataFromFirebase();
+            updateCartUI();
+            if(userProfile) { loadProfileData(); }
+
+            try {
+                const messaging = getMessaging(app);
+                onMessage(messaging, (payload) => {
+                    alert(payload.notification.title + "\n" + payload.notification.body);
+                });
+            } catch(e) { console.log("Messaging not supported on this browser."); }
+        });
+    </script>
+</body>
+</html>
